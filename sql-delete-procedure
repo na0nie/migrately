@@ -14,7 +14,7 @@ ALTER proc [dbo].[Attorneys_DeleteProfiles]
 		@Id int
 
 AS
-/*
+/* --- TEST CODE ---
 
 Execute dbo.Attorneys_DeleteProfiles 18
 
