@@ -86,7 +86,7 @@ Select * From dbo.Locations
 select *
 from dbo.languages
 where name like '%Spanish%'
-*/
+--- END TEST CODE --- */
 
 
 BEGIN
