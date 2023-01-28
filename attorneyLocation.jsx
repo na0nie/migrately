@@ -331,3 +331,4 @@ AttorneyLocation.propTypes = {
   states: PropTypes.arrayOf(PropTypes.shape({id: PropTypes.number, name: PropTypes.string})),
   setStates: PropTypes.func,
 };
+
