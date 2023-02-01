@@ -1,0 +1,25 @@
+import { v4 as uuid } from "uuid";
+
+export const DashboardMenu = [
+
+  {
+    id: uuid(),
+    title: "Attorney Dashboard",
+    roles: ["Attorney"],
+    icon: "camera",
+    children: [
+      {
+        id: uuid(),
+        link: "/attorney/dashboard",
+        name: "Dashboard",
+      },
+      {
+        id: uuid(),
+        link: "/attorney/profile",
+        name: "Profile",
+      },
+    ],
+  }, 
+ ];
+ 
+ export default DashboardMenu;
