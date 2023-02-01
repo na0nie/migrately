@@ -1,0 +1,38 @@
+import { lazy } from "react";
+
+const AttorneyForm = lazy(() => import('../components/attorney/addattorneyform/AttorneyForm'));
+const AttorneyProfile = lazy(() => import('../components/attorney/AttorneyProfile'));
+const AttorneyDashboard = lazy(() => import('../components/attorney/dashboard/AttorneyDashboard'));
+
+const attorneyRoutes = [
+  {
+    path: "/addattorney",
+    name: "Add Attorney Profile",
+    element: AttorneyForm,
+    roles: ["Attorney"],
+    exact: true,
+    isAnonymous: false,
+  },
+  {
+    path: "/attorney/dashboard",
+    name: "Attorney Dashboard",
+    element: AttorneyDashboard,
+    roles: ["Attorney"],
+    exact: true,
+    isAnonymous: false,
+  },
+  {
+    path: "/attorney/profile",
+    name: "Attorney Profile",
+    element: AttorneyProfile,
+    roles: ["Attorney"],
+    exact: true,
+    isAnonymous: false,
+  },
+];
+
+const allRoutes = [
+  ...attorneyRoutes,
+];
+
+export default allRoutes;
