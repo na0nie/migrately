@@ -1,6 +1,6 @@
 ALTER proc [dbo].[Attorneys_Insert]
-		@AttorneyLanguages dbo.LanguageNames READONLY					
-       ,@Practice nvarchar(255) = null
+            @AttorneyLanguages dbo.LanguageNames READONLY					
+       	   ,@Practice nvarchar(255) = null
 	   ,@LocationTypeId int
 	   ,@LineOne nvarchar(255)
 	   ,@LineTwo nvarchar(255)
