@@ -2,8 +2,7 @@ import React, { Fragment } from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import "../attorney.css";
 import PropTypes from "prop-types";
-import debug from "sabio-debug";
-const _logger = debug.extend("preview");
+
 function PreviewData(props) {
   const {
     values,
@@ -24,10 +23,6 @@ function PreviewData(props) {
   const languageMap = (lang) => {
     return lang?.name;
   };
-
-  _logger(attorneyInfo?.languages);
-  _logger("locationTypes", locationTypes);
-  _logger("states", states);
 
   const locationName = locationTypes.find(
     (lt) => Number(lt.id) === Number(attorneyInfo?.locationTypeId)
