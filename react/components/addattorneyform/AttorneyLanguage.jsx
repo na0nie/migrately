@@ -1,82 +1,92 @@
-import React, { Fragment } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Col, Row } from "react-bootstrap";
-import "../attorney.css";
+import { withFormik, Form, Field, FieldArray } from "formik";
 import PropTypes from "prop-types";
+import { addAttorneySchema } from "../../../schemas/addAttorneySchema";
+import lookUpService from "services/lookUpService";
+import toastr from "toastr";
 
-function PreviewData(props) {
-  const {
-    values,
-    onBack,
-    backLabel,
-    onNext,
-    nextLabel,
-    isSubmitting,
-    attorneyInfo,
-    locationTypes,
-    states,
-  } = props;
+function AttorneyLanguage(props) {
+  const { values, onBack, backLabel, onNext, nextLabel, isSubmitting } = props;
+
+  const [languageOptions, setLanguageOptions] = useState([]);
+
+  useEffect(() => {
+    lookUpService
+      .LookUp3Col(["Languages"])
+      .then(onLanguagesApiSuccess)
+      .catch(onLanguagesApiError);
+  }, []);
+
+  const onLanguagesApiSuccess = (response) => {
+    var target = response.items;
+
+    setLanguageOptions(() => {
+      return target;
+    });
+  };
+
+  const onLanguagesApiError = (errResponse) => {
+    toastr["error"]("Response Failed");
+  };
+
+  const mapLanguageOption = (language) => {
+    return (
+      <option value={language.name} key={language.id}>
+        {language.name}
+      </option>
+    );
+  };
 
   const handleSubmit = () => {
     onNext(values);
   };
 
-  const languageMap = (lang) => {
-    return lang?.name;
-  };
-
-  _logger(attorneyInfo?.languages);
-  _logger("locationTypes", locationTypes);
-  _logger("states", states);
-
-  const locationName = locationTypes.find(
-    (lt) => Number(lt.id) === Number(attorneyInfo?.locationTypeId)
-  )?.name;
-  const stateName = states.find(
-    (st) => Number(st.id) === Number(attorneyInfo?.stateId)
-  )?.name;
-
   return (
-    <Fragment>
-      <h2 className="mt-5 d-flex justify-content-center">Attorney Info</h2>
-      <Card.Body className="p-10 m-5 border rounded attorney-pv">
-        <Row className="mb-7 d-flex justify-content-center">
-          <Col lg={6} md={12}>
-            <Card.Title>PRACTICE NAME</Card.Title>
-            <Card.Text className="mb-5">{attorneyInfo?.practiceName}</Card.Text>
-            <Card.Title>LOCATION</Card.Title>
-            <Card.Subtitle>Address Type</Card.Subtitle>
-            <Card.Text>{locationName}</Card.Text>
-            <Card.Subtitle>Address Line One</Card.Subtitle>
-            <Card.Text>{attorneyInfo?.lineOne}</Card.Text>
-            <Card.Subtitle>Address Line Two</Card.Subtitle>
-            <Card.Text>{attorneyInfo?.lineTwo}</Card.Text>
-            <Card.Subtitle>City</Card.Subtitle>
-            <Card.Text>{attorneyInfo?.city}</Card.Text>
-            <Card.Subtitle>State</Card.Subtitle>
-            <Card.Text>{stateName}</Card.Text>
-            <Card.Subtitle>Zip</Card.Subtitle>
-            <Card.Text className="mb-5">{attorneyInfo?.zip}</Card.Text>
-          </Col>
-          <Col lg={6} md={12} sm={12}>
-            <Card.Title>CONTACT</Card.Title>
-            <Card.Subtitle>Phone</Card.Subtitle>
-            <Card.Text>{attorneyInfo?.phone}</Card.Text>
-            <Card.Subtitle>Email</Card.Subtitle>
-            <Card.Text>{attorneyInfo?.email}</Card.Text>
-            <Card.Subtitle>Website</Card.Subtitle>
-            <Card.Text className="mb-5">{attorneyInfo?.website}</Card.Text>
-            <Card.Title>LANGUAGES</Card.Title>
-            <Card.Text>
-              {attorneyInfo?.languages.map(languageMap).join(", ")}
-            </Card.Text>
-          </Col>
-        </Row>
-        <Col>
-          <Card.Title>BIO</Card.Title>
-          <Card.Text className="mb-5">{attorneyInfo?.bio}</Card.Text>
+    <Card.Body>
+      <Row className="mb-5 d-flex justify-content-center">
+        <Col lg={8} md={10} sm={12}>
+          <Form>
+            <h4 className="mb-5 text-uppercase">Languages</h4>
+            <FieldArray name="languages">
+              {({ remove, push }) => (
+                <div>
+                  {values.languages.length > 0 &&
+                    values.languages.map((language, index) => (
+                      <div className="form-group mb-3" key={index}>
+                        <Field
+                          as="select"
+                          className="form-select form-control"
+                          name={`languages.${index}.name`}
+                        >
+                          <option>Select Language</option>
+                          {languageOptions.map(mapLanguageOption)}
+                        </Field>
+                        <div className="mt-2 d-flex justify-content-end">
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger btn-xs"
+                            onClick={() => remove(index)}
+                          >
+                            x
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  <button
+                    type="button"
+                    className="btn btn-outline-success btn-sm"
+                    onClick={() => push({ name: "" })}
+                  >
+                    Add Language
+                  </button>
+                </div>
+              )}
+            </FieldArray>
+          </Form>
         </Col>
-      </Card.Body>
-      <Row md={12}>
+      </Row>
+      <Row md={12} sm={12}>
         <div className="attorney-Loki-actions d-flex justify-content-between">
           <button
             type="button"
@@ -96,40 +106,35 @@ function PreviewData(props) {
           </button>
         </div>
       </Row>
-    </Fragment>
+    </Card.Body>
   );
 }
 
-export default PreviewData;
+export default withFormik({
+  enableReinitialize: true,
+  mapPropsToValues: (props) => ({
+    languages: props.attorneyInfo.languages,
+  }),
+  validationSchema: addAttorneySchema,
+  handleSubmit: function (values, { props }) {
+    props.onNext(values);
+  },
+})(AttorneyLanguage);
 
-PreviewData.propTypes = {
+AttorneyLanguage.propTypes = {
   values: PropTypes.shape({
-    practiceName: PropTypes.string,
-    locationTypeId: PropTypes.number.isRequired,
-    lineOne: PropTypes.string.isRequired,
-    lineTwo: PropTypes.string.isRequired,
-    city: PropTypes.string.isRequired,
-    stateId: PropTypes.number.isRequired,
-    zip: PropTypes.string.isRequired,
-    bio: PropTypes.string,
-    phone: PropTypes.string,
-    email: PropTypes.string,
-    website: PropTypes.string,
-    languages: PropTypes.arrayOf(PropTypes.string),
+    languages: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string,
+      })
+    ),
   }),
   attorneyInfo: PropTypes.shape({
-    practiceName: PropTypes.string,
-    locationTypeId: PropTypes.number.isRequired,
-    lineOne: PropTypes.string.isRequired,
-    lineTwo: PropTypes.string.isRequired,
-    city: PropTypes.string.isRequired,
-    stateId: PropTypes.number.isRequired,
-    zip: PropTypes.string.isRequired,
-    bio: PropTypes.string,
-    phone: PropTypes.string,
-    email: PropTypes.string,
-    website: PropTypes.string,
-    languages: PropTypes.arrayOf(PropTypes.string),
+    languages: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string,
+      })
+    ),
   }),
   handleSubmit: PropTypes.func,
   isSubmitting: PropTypes.bool,
@@ -137,16 +142,4 @@ PreviewData.propTypes = {
   backLabel: PropTypes.string,
   onNext: PropTypes.func,
   nextLabel: PropTypes.string,
-  locationTypes: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
-  states: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
 };
